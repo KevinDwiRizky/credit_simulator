@@ -14,14 +14,20 @@ public class ConsoleView {
     private final BufferedReader in;
     private final PrintStream out;
     private final InstallmentFormatter formatter = new InstallmentFormatter();
+    private final boolean echoInput;
 
     public ConsoleView() {
-        this(new BufferedReader(new InputStreamReader(System.in)), System.out);
+        this(new BufferedReader(new InputStreamReader(System.in)), System.out, false);
     }
 
     public ConsoleView(BufferedReader in, PrintStream out) {
+        this(in, out, false);
+    }
+
+    public ConsoleView(BufferedReader in, PrintStream out, boolean echoInput) {
         this.in = in;
         this.out = out;
+        this.echoInput = echoInput;
     }
 
     public String ask(String prompt) {
@@ -30,7 +36,13 @@ public class ConsoleView {
         try {
             String line = in.readLine();
             if (line == null) {
+                if (echoInput) {
+                    out.println();
+                }
                 throw new InputEndedException("Input berakhir sebelum semua data terisi");
+            }
+            if (echoInput) {
+                out.println(line);
             }
             return line;
         } catch (IOException e) {
