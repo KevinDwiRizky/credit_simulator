@@ -1,6 +1,5 @@
 package factory;
 
-
 import exception.InvalidInputException;
 import model.Car;
 import model.Motor;
@@ -13,19 +12,24 @@ public final class VehicleFactory {
         // class utilitas, tidak perlu di-new
     }
 
-    public static Vehicle create(String type, String condition, int year) {
+    public static String normalizeType(String type) {
         if (type == null) {
             throw new InvalidInputException("Jenis kendaraan tidak boleh kosong");
         }
+        String normalized = type.trim().toLowerCase();
+        if (!normalized.equals("mobil") && !normalized.equals("motor")) {
+            throw new InvalidInputException("Jenis kendaraan harus Motor atau Mobil, bukan: " + type);
+        }
+        return normalized;
+    }
+
+    public static Vehicle create(String type, String condition, int year) {
+        String normalizedType = normalizeType(type);
         VehicleCondition vehicleCondition = VehicleCondition.fromText(condition);
 
-        switch (type.trim().toLowerCase()) {
-            case "mobil":
-                return new Car(vehicleCondition, year);
-            case "motor":
-                return new Motor(vehicleCondition, year);
-            default:
-                throw new InvalidInputException("Jenis kendaraan harus Motor atau Mobil, bukan: " + type);
+        if (normalizedType.equals("mobil")) {
+            return new Car(vehicleCondition, year);
         }
+        return new Motor(vehicleCondition, year);
     }
 }
