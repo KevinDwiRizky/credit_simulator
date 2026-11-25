@@ -1,6 +1,9 @@
 import client.JdkHttpFetcher;
+import client.LoanDataSource;
 import client.LoanRequestMapper;
 import client.RemoteLoanDataSource;
+import command.CommandLoop;
+import command.CommandRegistryFactory;
 import controller.CreditSimulatorController;
 import exception.InputEndedException;
 import exception.InvalidInputException;
@@ -31,9 +34,7 @@ public class Main {
             System.out.println("Pemakaian: credit_simulator [file_input.txt]");
             return 2;
         }
-        // SEMENTARA: "--load" diganti menu "load" di Commit 11
-        boolean loadMode = args.length == 1 && args[0].equals("--load");
-        boolean fromFile = args.length == 1 && !loadMode;
+        boolean fromFile = args.length == 1;
 
         try {
             LoanValidator validator = new LoanValidator();
@@ -44,13 +45,15 @@ public class Main {
                     view,
                     validator,
                     new LoanCalculator(new StepUpInterestPolicy()),
-                    !fromFile);   // dari file: tanpa tanya-ulang
+                    !fromFile);
 
-            if (loadMode) {
-                controller.loadAndCalculate(new RemoteLoanDataSource(
-                        new JdkHttpFetcher(), loadUrl(), new LoanRequestMapper(validator)));
-            } else {
+            if (fromFile) {
                 controller.run();
+            } else {
+                LoanDataSource loanSource = new RemoteLoanDataSource(
+                        new JdkHttpFetcher(), loadUrl(), new LoanRequestMapper(validator));
+                new CommandLoop(view,
+                        CommandRegistryFactory.createDefault(view, controller, loanSource)).run();
             }
             return 0;
         } catch (InvalidInputException | InputEndedException | LoanLoadException e) {
