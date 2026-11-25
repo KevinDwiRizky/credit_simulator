@@ -1,5 +1,6 @@
 package controller;
 
+import client.LoanDataSource;
 import exception.InvalidInputException;
 import factory.VehicleFactory;
 import model.LoanRequest;
@@ -34,6 +35,12 @@ public class CreditSimulatorController {
         LoanRequest request = collectRequest();
         List<YearlyInstallment> result = calculator.calculate(request);
         view.showResult(result);
+    }
+
+    public void loadAndCalculate(LoanDataSource source) {
+        LoanRequest request = source.load();
+        view.showRequest(request);
+        view.showResult(calculator.calculate(request));
     }
 
     private LoanRequest collectRequest() {

@@ -1,12 +1,14 @@
 package view;
 
 import exception.InputEndedException;
+import model.LoanRequest;
 import service.YearlyInstallment;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.math.BigDecimal;
 import java.util.List;
 
 public class ConsoleView {
@@ -56,6 +58,20 @@ public class ConsoleView {
 
     public void showError(String message) {
         out.println("Error: " + message);
+    }
+
+    public void showRequest(LoanRequest request) {
+        out.println("Data pinjaman yang dimuat:");
+        printField("Jenis kendaraan", request.vehicle().getTypeName());
+        printField("Kondisi", request.vehicle().getCondition().getLabel());
+        printField("Tahun", String.valueOf(request.vehicle().getYear()));
+        printField("Jumlah pinjaman", formatter.formatMoney(BigDecimal.valueOf(request.totalLoanAmount())));
+        printField("Tenor", request.tenureYears() + " tahun");
+        printField("DP", formatter.formatMoney(BigDecimal.valueOf(request.downPayment())));
+    }
+
+    private void printField(String label, String value) {
+        out.println(String.format("%-16s : %s", label, value));
     }
 
     public void showResult(List<YearlyInstallment> installments) {
