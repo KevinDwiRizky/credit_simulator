@@ -2,6 +2,7 @@ package view;
 
 import exception.InputEndedException;
 import model.LoanRequest;
+import service.Calculation;
 import service.YearlyInstallment;
 
 import java.io.BufferedReader;
@@ -62,6 +63,16 @@ public class ConsoleView {
 
     public void showRequest(LoanRequest request) {
         out.println("Data pinjaman yang dimuat:");
+        printRequestFields(request);
+    }
+
+    public void showSheet(String name, Calculation calculation) {
+        out.println("Sheet '" + name + "':");
+        printRequestFields(calculation.request());
+        showResult(calculation.installments());
+    }
+
+    private void printRequestFields(LoanRequest request) {
         printField("Jenis kendaraan", request.vehicle().getTypeName());
         printField("Kondisi", request.vehicle().getCondition().getLabel());
         printField("Tahun", String.valueOf(request.vehicle().getYear()));

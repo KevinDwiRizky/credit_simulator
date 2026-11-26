@@ -1,12 +1,6 @@
-# jenis kendaraan (Motor|Mobil)
 mobil
-# kondisi (Bekas|Baru)
 bekas
-# tahun kendaraan
 2020
-# jumlah pinjaman total
 100000000
-# tenor (tahun)
 3
-# jumlah DP
 25000000

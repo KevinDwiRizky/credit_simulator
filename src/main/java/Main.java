@@ -20,6 +20,7 @@ public class Main {
 
     static final String DEFAULT_LOAD_URL =
             "https://run.mocky.io/v3/9108b1da-beec-409e-ae14-e8091955666c";
+
     static final String LOAD_URL_ENV = "CREDIT_SIMULATOR_LOAD_URL";
 
     public static void main(String[] args) {

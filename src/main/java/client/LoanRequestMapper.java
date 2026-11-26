@@ -46,7 +46,6 @@ public class LoanRequestMapper {
         }
     }
 
-    /** Ambil field sebagai teks. Angka JSON diubah ke teks bilangan bulat supaya bisa divalidasi. */
     private static String text(Map<String, Object> data, String field) {
         Object value = data.get(field);
         if (value == null) {

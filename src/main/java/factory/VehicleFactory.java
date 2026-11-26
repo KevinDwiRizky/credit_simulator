@@ -9,7 +9,6 @@ import model.VehicleCondition;
 public final class VehicleFactory {
 
     private VehicleFactory() {
-        // class utilitas, tidak perlu di-new
     }
 
     public static String normalizeType(String type) {

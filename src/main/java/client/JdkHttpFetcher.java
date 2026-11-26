@@ -69,8 +69,17 @@ public class JdkHttpFetcher implements HttpFetcher {
         } catch (HttpTimeoutException e) {
             throw new LoanLoadException("Web service tidak merespons (timeout)");
         } catch (IOException e) {
-            throw new LoanLoadException("Gagal menghubungi web service: " + e.getMessage());
+            throw new LoanLoadException("Gagal menghubungi web service: " + describe(e));
         }
+    }
+
+    private static String describe(Throwable error) {
+        for (Throwable t = error; t != null; t = t.getCause()) {
+            if (t.getMessage() != null && !t.getMessage().isBlank()) {
+                return t.getMessage();
+            }
+        }
+        return error.getClass().getSimpleName();
     }
 
     private static URI toUri(String url) {
@@ -93,7 +102,7 @@ public class JdkHttpFetcher implements HttpFetcher {
         } catch (IllegalArgumentException | FileSystemNotFoundException e) {
             throw new LoanLoadException("URL file:// tidak valid (pakai path absolut): " + uri);
         } catch (IOException e) {
-            throw new LoanLoadException("Gagal membaca file " + uri + ": " + e.getMessage());
+            throw new LoanLoadException("Gagal membaca file " + uri + ": " + describe(e));
         }
     }
 

@@ -33,7 +33,6 @@ public final class JsonParser {
         return value;
     }
 
-    /** Sama seperti parse, tapi JSON-nya harus berupa object { ... }. */
     @SuppressWarnings("unchecked")
     public static Map<String, Object> parseObject(String json) {
         Object value = parse(json);
@@ -42,8 +41,6 @@ public final class JsonParser {
         }
         return (Map<String, Object>) value;
     }
-
-    // ---------- nilai ----------
 
     private Object readValue(int depth) {
         if (depth > MAX_DEPTH) {
@@ -107,7 +104,7 @@ public final class JsonParser {
 
     private List<Object> readArray(int depth) {
         List<Object> list = new ArrayList<>();
-        pos++; // lewati '['
+        pos++;
         skipWhitespace();
         if (peek() == ']') {
             pos++;
@@ -218,8 +215,6 @@ public final class JsonParser {
         }
         pos += word.length();
     }
-
-    // ---------- alat bantu ----------
 
     private char peek() {
         if (pos >= text.length()) {

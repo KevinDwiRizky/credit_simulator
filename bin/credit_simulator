@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+MIN_JAVA=17
+
+SOURCE="${BASH_SOURCE[0]}"
+while [[ -h "$SOURCE" ]]; do
+  DIR="$(cd -P "$(dirname "$SOURCE")" && pwd)"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ "$SOURCE" != /* ]] && SOURCE="$DIR/$SOURCE"
+done
+ROOT="$(cd -P "$(dirname "$SOURCE")/.." && pwd)"
+
+JAR="${CREDIT_SIMULATOR_JAR:-$ROOT/target/credit-simulator.jar}"
+
+die() {
+  echo "credit_simulator: $*" >&2
+  exit 1
+}
+
+java_major() {
+  local version
+  version="$(java -version 2>&1 | sed -n 's/.*version "\([^"]*\)".*/\1/p' | head -n 1)"
+  case "$version" in
+    1.*) version="${version#1.}" ;;
+  esac
+  echo "${version%%[.+_-]*}"
+}
+
+require_java() {
+  command -v java >/dev/null 2>&1 \
+    || die "Java tidak ditemukan. Pasang JDK $MIN_JAVA atau lebih baru."
+  local major
+  major="$(java_major)"
+  [[ "$major" =~ ^[0-9]+$ ]] || die "Versi Java tidak terbaca."
+  (( major >= MIN_JAVA )) \
+    || die "Butuh Java $MIN_JAVA atau lebih baru (terdeteksi: Java $major)."
+}
+
+needs_build() {
+  [[ -f "$JAR" ]] || return 0
+  [[ -n "$(find "$ROOT/src" "$ROOT/pom.xml" -newer "$JAR" 2>/dev/null)" ]]
+}
+
+build() {
+  command -v mvn >/dev/null 2>&1 \
+    || die "Maven (mvn) tidak ditemukan, padahal JAR perlu dibuat. Pasang Maven, atau set CREDIT_SIMULATOR_JAR ke JAR yang sudah ada."
+  echo "Membangun aplikasi (mvn package)..." >&2
+  (cd "$ROOT" && mvn -q -B -DskipTests package) >&2 \
+    || die "Build gagal. Jalankan 'mvn package' di folder project untuk melihat detailnya."
+}
+
+require_java
+
+if [[ -z "${CREDIT_SIMULATOR_JAR:-}" ]] && needs_build; then
+  build
+fi
+
+[[ -f "$JAR" ]] || die "JAR tidak ditemukan: $JAR"
+
+exec java -jar "$JAR" "$@"

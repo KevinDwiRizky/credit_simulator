@@ -6,6 +6,7 @@ import factory.VehicleFactory;
 import model.LoanRequest;
 import model.Vehicle;
 import model.VehicleCondition;
+import service.Calculation;
 import service.LoanCalculator;
 import service.YearlyInstallment;
 import validation.LoanValidator;
@@ -31,16 +32,20 @@ public class CreditSimulatorController {
         this.retryOnInvalid = retryOnInvalid;
     }
 
-    public void run() {
-        LoanRequest request = collectRequest();
-        List<YearlyInstallment> result = calculator.calculate(request);
-        view.showResult(result);
+    public Calculation run() {
+        return calculateAndShow(collectRequest());
     }
 
-    public void loadAndCalculate(LoanDataSource source) {
+    public Calculation loadAndCalculate(LoanDataSource source) {
         LoanRequest request = source.load();
         view.showRequest(request);
-        view.showResult(calculator.calculate(request));
+        return calculateAndShow(request);
+    }
+
+    private Calculation calculateAndShow(LoanRequest request) {
+        List<YearlyInstallment> result = calculator.calculate(request);
+        view.showResult(result);
+        return new Calculation(request, result);
     }
 
     private LoanRequest collectRequest() {
